@@ -2,9 +2,16 @@
 <project version="4">
   <component name="dataSourceStorageLocal" created-in="PY-242.21829.153">
     <data-source name="db" uuid="8e49c321-2cac-4e16-ae22-147372f7072e">
-      <database-info product="" version="" jdbc-version="" driver-name="" driver-version="" dbms="SQLITE" />
+      <database-info product="SQLite" version="3.45.1" jdbc-version="4.2" driver-name="SQLite JDBC" driver-version="3.45.1.0" dbms="SQLITE" exact-version="3.45.1" exact-driver-version="3.45">
+        <identifier-quote-string>&quot;</identifier-quote-string>
+      </database-info>
+      <case-sensitivity plain-identifiers="mixed" quoted-identifiers="mixed" />
       <auth-provider>no-auth</auth-provider>
-      <schema-mapping />
+      <schema-mapping>
+        <introspection-scope>
+          <node kind="schema" qname="@" />
+        </introspection-scope>
+      </schema-mapping>
     </data-source>
   </component>
 </project>
