@@ -4,7 +4,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import User, StudentProfile, TeacherProfile
-from .forms import UserRegisterForm
+from .forms import UserRegisterForm, StudentSelectionForm
 
 def login_view(request):
     selected_role = request.GET.get('role')
@@ -73,3 +73,17 @@ def teacher_list(request):
 def teacher_profile(request, user_id):
     teacher = get_object_or_404(TeacherProfile, user_id=user_id)
     return render(request, 'teacher_profile.html', {'teacher': teacher})
+
+
+def select_teacher_subject(request):
+    if request.method == 'POST':
+        form = StudentSelectionForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('success_url')  # Replace with your success URL
+    else:
+        form = StudentSelectionForm()
+
+    # Retrieve teachers list to display in template
+    teachers = User.objects.filter(role=User.Role.TEACHER)
+    return render(request, 'teacher_list.html', {'form': form, 'teachers': teachers})

@@ -5,23 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="26509384-be46-4831-b1e0-5bbde10caa0d" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/templates/base.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/home.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/login.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/register.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/student_home.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/student_list.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/student_profile.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/teacher_home.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/teacher_list.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/teacher_profile.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/user/forms.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/user/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/djangoProject2/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/djangoProject2/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/djangoProject2/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/djangoProject2/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/teacher_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/teacher_list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/forms.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/views.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -105,7 +94,7 @@
       <option name="presentableId" value="Default" />
       <updated>1730642686916</updated>
       <workItem from="1730642688252" duration="11024000" />
-      <workItem from="1730708864537" duration="13731000" />
+      <workItem from="1730708864537" duration="17080000" />
     </task>
     <servers />
   </component>
