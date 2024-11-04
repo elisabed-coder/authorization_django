@@ -48,6 +48,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'djangoProject2.urls'
@@ -125,3 +126,8 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'user.User'
+
+# settings.py
+LOGIN_REDIRECT_URL = 'home'  # Correct without namespace
+LOGOUT_REDIRECT_URL = 'login_view'  # Correct without namespace
+LOGIN_URL = 'login_view'  # Correct without namespace

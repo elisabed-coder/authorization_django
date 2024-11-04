@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>Login{% if selected_role %} as {{ selected_role }}{% endif %}</h2>
+
+  <div class="role-selection">
+    <h3>Select Role:</h3>
+    <form method="get" action="{% url 'user:login_view' %}">  <!-- Updated to include namespace -->
+      <button type="submit" name="role" value="STUDENT" class="btn">Login as Student</button>
+      <button type="submit" name="role" value="TEACHER" class="btn">Login as Teacher</button>
+    </form>
+  </div>
+
+  {% if selected_role %}
+  <form method="post" action="{% url 'user:login_view' %}">  <!-- Updated to include namespace -->
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="hidden" name="role" value="{{ selected_role }}">
+    <button type="submit">Login</button>
+  </form>
+  {% endif %}
+
+  {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endblock %}

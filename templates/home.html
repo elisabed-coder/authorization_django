@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home Page</title>
+    {% load static %}
+</head>
+<body>
+    <header>
+        <h1>Welcome to the Home Page</h1>
+    </header>
+
+    <div class="content">
+        {% if user.is_authenticated %}
+            <h2>Hello, {{ user.username }}!</h2>
+
+            {% if user.role == "STUDENT" %}
+                <p>Welcome to the student dashboard. Here you can find your courses, view your progress, and access other resources.</p>
+                <a href="{% url 'user:student_profile' user.id %}">View Profile</a> |
+                <a href="{% url 'user:teacher_list' %}">Teacher List</a>
+
+
+            {% elif user.role == "TEACHER" %}
+                <p>Welcome to the teacher dashboard. Here you can manage your classes, view student progress, and access teaching resources.</p>
+                <a href="{% url 'user:teacher_profile' user.id %}">View Profile</a> |
+                <a href="{% url 'user:student_list' %}">Student List</a>
+
+            {% else %}
+                <p>Welcome to the admin dashboard.</p>
+            {% endif %}
+
+        {% else %}
+            <p>Please <a href="{% url 'user:login_view' %}">log in</a> to access your dashboard.</p>
+        {% endif %}
+    <p>Your role: {{ user.role }}</p>
+    </div>
+    <a href="{% url 'user:logout' %}">Logout</a>
+</body>
+</html>
