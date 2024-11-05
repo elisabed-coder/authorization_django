@@ -144,14 +144,15 @@ def get_teachers_by_subject(request):
         logger.exception("Error fetching teachers")
         return JsonResponse({'error': str(e)}, status=500)
 
-#
-# @login_required
-# @require_http_methods(["POST"])
-# def delete_selection(request):
-#     user = request.user
-#     user.subject = None
-#     user.selected_teacher = None
-#     user.save()
-#     logger.info(f"User {user.username} cleared selections.")
-#     messages.success(request, 'Your selection has been deleted successfully.')
-#     return JsonResponse({'status': 'success'})
+
+@login_required
+@require_http_methods(["POST"])
+def delete_subject_selection(request):
+    if request.user.is_authenticated:
+        # Clear both the selected subject and teacher for the user
+        request.user.subject = None
+        request.user.selected_teacher = None  # Assuming selected_teacher is a field on the user model
+        request.user.save()
+        return JsonResponse({'message': 'Subject and teacher selection deleted successfully.'}, status=200)
+    else:
+        return JsonResponse({'error': 'Invalid request.'}, status=400)

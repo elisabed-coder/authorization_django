@@ -12,4 +12,6 @@ urlpatterns = [
     path('select-teacher-subject/', views.select_teacher_subject, name='select_teacher_subject'),
     path('get-teachers/', views.get_teachers_by_subject, name='get_teachers_by_subject'),  # Add this line
     path('logout/', views.logout_view, name='logout'),
+    path('delete_subject_selection/', views.delete_subject_selection, name='delete_subject_selection'),
+
 ]

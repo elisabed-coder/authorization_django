@@ -59,6 +59,21 @@
     </div>
     {% endif %}
 
+    <h2>Your Selected Subject</h2>
+
+{% if user.subject %}
+    <ul id="subjectList">
+        <li>
+            <strong>Selected Subject:</strong> {{ user.subject }}
+            <button type="button" class="delete-subject-button" data-subject="{{ user.subject }}">
+                Delete
+            </button>
+        </li>
+    </ul>
+{% else %}
+    <p>No subject selected yet.</p>
+{% endif %}
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
     $(document).ready(function() {
@@ -103,6 +118,33 @@
             });
         });
     });
+$(document).ready(function() {
+    // Handle subject deletion along with teacher deletion
+    $(document).on('click', '.delete-subject-button', function() {
+        let subject = $(this).data('subject');
+        console.log('Deleting subject and associated teacher:', subject);  // Debug log
+
+        $.ajax({
+            url: "{% url 'user:delete_subject_selection' %}",
+            type: "POST",
+            data: {
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function() {
+                console.log('Subject and teacher deleted successfully');
+                $('#subjectList').remove();  // Remove the subject list item from the DOM
+                $('#teacherList').remove();  // Remove the teacher list item from the DOM, if applicable
+                location.reload();  // Reload the page to update the subject and teacher display
+            },
+            error: function(xhr, status, error) {
+                console.error('Delete Error:', error);
+                console.error('Status:', status);
+                console.error('Response:', xhr.responseText);
+            }
+        });
+    });
+});
+
     </script>
 </body>
 </html>
