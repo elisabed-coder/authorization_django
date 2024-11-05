@@ -8,6 +8,10 @@ from django.views.decorators.http import require_http_methods
 from .models import User, Teacher
 from .forms import UserRegisterForm, StudentSelectionForm
 from django.http import JsonResponse
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 def login_view(request):
     selected_role = request.GET.get('role')
@@ -101,7 +105,9 @@ def select_teacher_subject(request):
                 user = form.save(commit=False)
                 user.subject = subject
                 user.selected_teacher = selected_teacher
-                user.role = User.Role.STUDENT
+
+                # You may want to change the role dynamically based on some logic
+                user.role = User.Role.STUDENT  # This might be changed based on your logic
                 user.save()
 
                 logger.info(f"User saved successfully. Subject: {user.subject}, Teacher: {user.selected_teacher}")
@@ -114,8 +120,9 @@ def select_teacher_subject(request):
             logger.exception("Error saving form")
             messages.error(request, f'An error occurred: {str(e)}')
     else:
+        # Handle GET request and populate the form with user's current selections
         form = StudentSelectionForm(instance=request.user)
-        logger.info("Initialized GET form")
+        logger.info(f"Initialized GET form for user: {request.user.username}")
 
     context = {
         'form': form,
@@ -131,10 +138,20 @@ def get_teachers_by_subject(request):
     logger.info(f"Fetching teachers for subject: {subject}")
 
     try:
-        teachers = Teacher.objects.filter(subject=subject).values('id', 'username')
-        logger.info(f"Found teachers: {teachers}")
+        teachers = Teacher.teacher.get_queryset().filter(subject=subject).values('id', 'username')
+        logger.info(f"Found teachers: {list(teachers)}")
         return JsonResponse(list(teachers), safe=False)
     except Exception as e:
         logger.exception("Error fetching teachers")
         return JsonResponse({'error': str(e)}, status=500)
-
+#
+# @login_required
+# @require_http_methods(["POST"])
+# def delete_selection(request):
+#     user = request.user
+#     user.subject = None
+#     user.selected_teacher = None
+#     user.save()
+#     logger.info(f"User {user.username} cleared selections.")
+#     messages.success(request, 'Your selection has been deleted successfully.')
+#     return JsonResponse({'status': 'success'})

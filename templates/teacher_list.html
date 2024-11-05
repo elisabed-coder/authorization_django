@@ -54,6 +54,7 @@
         <p>Current User: {{ user.username }}</p>
         <p>Current Subject: {{ user.subject }}</p>
         <p>Form Data: {{ form.data }}</p>
+        <p>selected teacher: {{ user.selected_teacher }}</p>
         <p>Form Errors: {{ form.errors }}</p>
     </div>
     {% endif %}
@@ -64,13 +65,13 @@
         console.log('Document ready');  // Debug log
 
         // Add form submission handler
-        $('#teacherSelectionForm').on('submit', function(e) {
+        $('#teacherSelectionForm').on('submit', function() {
             console.log('Form submitted');  // Debug log
         });
 
         // Handle subject change
         $('#id_subject').change(function() {
-            var selectedSubject = $(this).val();
+            let selectedSubject = $(this).val();
             console.log('Selected subject:', selectedSubject);  // Debug log
 
             $.ajax({
@@ -78,7 +79,7 @@
                 data: { 'subject': selectedSubject },
                 success: function(data) {
                     console.log('Received teacher data:', data);  // Debug log
-                    var teacherSelect = $('#id_selected_teacher');
+                    let teacherSelect = $('#id_selected_teacher');
                     teacherSelect.empty();
 
                     // Add a default option

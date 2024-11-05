@@ -28,6 +28,8 @@
 
             <h3>Your Subject:</h3>
             <p>{{ user.subject }}</p>
+            <p>selected teacher: {{ user.selected_teacher }}</p>
+
 
         {% else %}
             <p>Please <a href="{% url 'user:login_view' %}">log in</a> to access your dashboard.</p>

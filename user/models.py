@@ -19,6 +19,8 @@ class User(AbstractUser):
     base_role = Role.ADMIN
     role = models.CharField(max_length=50, choices=Role.choices)
     subject = models.CharField(max_length=100, choices=SubjectChoices.choices, blank=True, null=True)
+    selected_teacher = models.ForeignKey('Teacher', on_delete=models.SET_NULL, null=True, blank=True)
+
 
     def save(self, *args, **kwargs):
         if not self.role:
