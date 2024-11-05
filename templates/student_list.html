@@ -4,6 +4,6 @@
 <h2>Students</h2>
 {% for student in students %}
     <p>{{ student.username }}</p>
-    <a href="{% url 'user:student_profile' student.id %}">View Profile</a>
+{#    <a href="{% url 'user:student_profile' student.id %}">View Profile</a>#}
 {% endfor %}
 {% endblock %}

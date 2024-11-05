@@ -1,4 +1,3 @@
-# models.py
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db.models.signals import post_save
@@ -19,10 +18,13 @@ class User(AbstractUser):
 
     base_role = Role.ADMIN
     role = models.CharField(max_length=50, choices=Role.choices)
-    subject = models.CharField(max_length=100, blank=True, null=True, choices=SubjectChoices.choices)
+    subject = models.CharField(max_length=100, choices=SubjectChoices.choices, blank=True, null=True)
 
     def save(self, *args, **kwargs):
+        if not self.role:
+            self.role = self.Role.ADMIN
         super().save(*args, **kwargs)
+
 
 class StudentManager(BaseUserManager):
     def get_queryset(self, *args, **kwargs):
@@ -40,14 +42,6 @@ class Student(User):
         return "Only for Students"
 
 @receiver(post_save, sender=Student)
-def create_student_profile(sender, instance, created, **kwargs):
-    if created and instance.role == "STUDENT":
-        StudentProfile.objects.create(user=instance)
-
-class StudentProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    student_id = models.IntegerField(null=True, blank=True)
-
 class TeacherManager(BaseUserManager):
     def get_queryset(self, *args, **kwargs):
         results = super().get_queryset(*args, **kwargs)
@@ -63,11 +57,3 @@ class Teacher(User):
     def welcome(self):
         return "Only for Teachers"
 
-@receiver(post_save, sender=Teacher)
-def create_teacher_profile(sender, instance, created, **kwargs):
-    if created and instance.role == "TEACHER":
-        TeacherProfile.objects.create(user=instance)
-
-class TeacherProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    teacher_id = models.IntegerField(null=True, blank=True)

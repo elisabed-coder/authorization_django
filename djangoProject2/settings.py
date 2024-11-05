@@ -129,5 +129,5 @@ AUTH_USER_MODEL = 'user.User'
 
 # settings.py
 LOGIN_REDIRECT_URL = 'home'  # Correct without namespace
-LOGOUT_REDIRECT_URL = 'login_view'  # Correct without namespace
-LOGIN_URL = 'login_view'  # Correct without namespace
+LOGOUT_REDIRECT_URL = 'user:login_view'  # Correct without namespace
+LOGIN_URL = 'user:login_view'  # Correct without namespace

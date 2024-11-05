@@ -1,23 +1,107 @@
-<!-- select_teacher_subject.html -->
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Select Subject</title>
+    <title>Select Subject and Teacher</title>
+    <style>
+        .form-error { color: red; }
+        .debug-info { background: #f0f0f0; padding: 10px; margin: 10px 0; }
+    </style>
 </head>
 <body>
-    <h1>Select Your Subject</h1>
-    <form method="post">
+    <h1>Select Your Subject and Teacher</h1>
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <form method="post" action="{% url 'user:select_teacher_subject' %}" id="teacherSelectionForm">
         {% csrf_token %}
-        {{ form.as_p }}
+
+        {% if form.non_field_errors %}
+        <div class="form-error">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        <div class="form-group">
+            <label for="id_subject">{{ form.subject.label }}</label>
+            {{ form.subject }}
+            {% if form.subject.errors %}
+            <div class="form-error">{{ form.subject.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="id_selected_teacher">{{ form.selected_teacher.label }}</label>
+            {{ form.selected_teacher }}
+            {% if form.selected_teacher.errors %}
+            <div class="form-error">{{ form.selected_teacher.errors }}</div>
+            {% endif %}
+        </div>
+
         <button type="submit">Save Selection</button>
     </form>
 
-    <h2>Available Teachers</h2>
-    <ul>
-        {% for teacher in teachers %}
-            <li>{{ teacher.username }} - {{ teacher.get_subject_display }}</li>
-        {% endfor %}
-    </ul>
+    {% if debug %}
+    <div class="debug-info">
+        <h3>Debug Information</h3>
+        <p>Current User: {{ user.username }}</p>
+        <p>Current Subject: {{ user.subject }}</p>
+        <p>Form Data: {{ form.data }}</p>
+        <p>Form Errors: {{ form.errors }}</p>
+    </div>
+    {% endif %}
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+    $(document).ready(function() {
+        console.log('Document ready');  // Debug log
+
+        // Add form submission handler
+        $('#teacherSelectionForm').on('submit', function(e) {
+            console.log('Form submitted');  // Debug log
+        });
+
+        // Handle subject change
+        $('#id_subject').change(function() {
+            var selectedSubject = $(this).val();
+            console.log('Selected subject:', selectedSubject);  // Debug log
+
+            $.ajax({
+                url: "{% url 'user:get_teachers_by_subject' %}",
+                data: { 'subject': selectedSubject },
+                success: function(data) {
+                    console.log('Received teacher data:', data);  // Debug log
+                    var teacherSelect = $('#id_selected_teacher');
+                    teacherSelect.empty();
+
+                    // Add a default option
+                    teacherSelect.append($('<option>', {
+                        value: '',
+                        text: 'Select a teacher'
+                    }));
+
+                    $.each(data, function(index, teacher) {
+                        teacherSelect.append($('<option>', {
+                            value: teacher.id,
+                            text: teacher.username
+                        }));
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', error);
+                    console.error('Status:', status);
+                    console.error('Response:', xhr.responseText);
+                }
+            });
+        });
+    });
+    </script>
 </body>
 </html>

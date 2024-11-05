@@ -1,10 +1,13 @@
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import  redirect, render
 from django.contrib.auth import login as auth_login, authenticate, logout
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, logger
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .models import User, StudentProfile, TeacherProfile
+from django.views.decorators.http import require_http_methods
+
+from .models import User, Teacher
 from .forms import UserRegisterForm, StudentSelectionForm
+from django.http import JsonResponse
 
 def login_view(request):
     selected_role = request.GET.get('role')
@@ -36,18 +39,27 @@ def login_view(request):
         'selected_role': selected_role
     })
 
+
 def register(request):
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)
         if form.is_valid():
-            user = form.save()
+            user = form.save(commit=False)
+            user.role = form.cleaned_data['role']  # Set the role based on form input
+            user.save()
             auth_login(request, user)
+
+            # Redirect to a different form based on the role
+            if user.role == User.Role.STUDENT:
+                return redirect('user:home')  # Redirect to subject selection for students
+
             messages.success(request, 'Registration successful.')
             return redirect('user:home')
         else:
             messages.error(request, 'Unsuccessful registration. Invalid information.')
     else:
         form = UserRegisterForm()
+
     return render(request, 'register.html', {'form': form})
 
 
@@ -56,34 +68,73 @@ def logout_view(request):
     return redirect('user:login_view')
 @login_required
 def home(request):
-    return render(request, 'home.html')
-
+    user = request.user  # Get the logged-in user
+    print(user.subject)  # Print to the console for debugging
+    return render(request, 'home.html', {'user': user})  # Pass user to the context
 def student_list(request):
     students = User.objects.filter(role=User.Role.STUDENT)
     return render(request, 'student_list.html', {'students': students})
-
-def student_profile(request, user_id):
-    student = get_object_or_404(StudentProfile, user_id=user_id)
-    return render(request, 'student_profile.html', {'student': student})
 
 def teacher_list(request):
     teachers = User.objects.filter(role=User.Role.TEACHER)
     return render(request, 'teacher_list.html', {'teachers': teachers})
 
-def teacher_profile(request, user_id):
-    teacher = get_object_or_404(TeacherProfile, user_id=user_id)
-    return render(request, 'teacher_profile.html', {'teacher': teacher})
 
-
+@login_required
 def select_teacher_subject(request):
-    if request.method == 'POST':
-        form = StudentSelectionForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('success_url')  # Replace with your success URL
-    else:
-        form = StudentSelectionForm()
+    logger.info(f"Method: {request.method}")
+    logger.info(f"User: {request.user.username}")
 
-    # Retrieve teachers list to display in template
-    teachers = User.objects.filter(role=User.Role.TEACHER)
-    return render(request, 'teacher_list.html', {'form': form, 'teachers': teachers})
+    if request.method == 'POST':
+        logger.info(f"POST data: {request.POST}")
+        form = StudentSelectionForm(request.POST, instance=request.user)
+
+        try:
+            if form.is_valid():
+                logger.info(f"Form is valid. Cleaned data: {form.cleaned_data}")
+
+                # Get the selected teacher instance
+                selected_teacher = form.cleaned_data['selected_teacher']
+                subject = form.cleaned_data['subject']
+
+                # Update user
+                user = form.save(commit=False)
+                user.subject = subject
+                user.selected_teacher = selected_teacher
+                user.role = User.Role.STUDENT
+                user.save()
+
+                logger.info(f"User saved successfully. Subject: {user.subject}, Teacher: {user.selected_teacher}")
+                messages.success(request, 'Your selection has been saved successfully.')
+                return redirect('user:home')
+            else:
+                logger.error(f"Form validation failed. Errors: {form.errors}")
+                messages.error(request, 'Please correct the errors below.')
+        except Exception as e:
+            logger.exception("Error saving form")
+            messages.error(request, f'An error occurred: {str(e)}')
+    else:
+        form = StudentSelectionForm(instance=request.user)
+        logger.info("Initialized GET form")
+
+    context = {
+        'form': form,
+        'user': request.user,
+        'debug': True
+    }
+    return render(request, 'teacher_list.html', context)
+
+
+@require_http_methods(["GET"])
+def get_teachers_by_subject(request):
+    subject = request.GET.get('subject')
+    logger.info(f"Fetching teachers for subject: {subject}")
+
+    try:
+        teachers = Teacher.objects.filter(subject=subject).values('id', 'username')
+        logger.info(f"Found teachers: {teachers}")
+        return JsonResponse(list(teachers), safe=False)
+    except Exception as e:
+        logger.exception("Error fetching teachers")
+        return JsonResponse({'error': str(e)}, status=500)
+
