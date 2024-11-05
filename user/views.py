@@ -8,9 +8,7 @@ from django.views.decorators.http import require_http_methods
 from .models import User, Teacher
 from .forms import UserRegisterForm, StudentSelectionForm
 from django.http import JsonResponse
-import logging
 
-logger = logging.getLogger(__name__)
 
 
 def login_view(request):
@@ -138,12 +136,14 @@ def get_teachers_by_subject(request):
     logger.info(f"Fetching teachers for subject: {subject}")
 
     try:
-        teachers = Teacher.teacher.get_queryset().filter(subject=subject).values('id', 'username')
+        # Filter by subject and role
+        teachers = Teacher.objects.filter(subject=subject, role=User.Role.TEACHER).values('id', 'username')
         logger.info(f"Found teachers: {list(teachers)}")
         return JsonResponse(list(teachers), safe=False)
     except Exception as e:
         logger.exception("Error fetching teachers")
         return JsonResponse({'error': str(e)}, status=500)
+
 #
 # @login_required
 # @require_http_methods(["POST"])

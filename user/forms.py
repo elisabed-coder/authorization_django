@@ -34,27 +34,17 @@ class StudentSelectionForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Initialize with all teachers if no subject is selected
-        self.fields['selected_teacher'].queryset = Teacher.objects.all()
+        # Initialize queryset to only teachers
+        self.fields['selected_teacher'].queryset = Teacher.objects.filter(role=User.Role.TEACHER)
 
-        # If there's initial data with a subject, filter teachers
+        # Filter teachers by subject if subject is specified
         if self.data.get('subject'):
             self.fields['selected_teacher'].queryset = Teacher.objects.filter(
-                subject=self.data.get('subject')
+                subject=self.data.get('subject'),
+                role=User.Role.TEACHER
             )
         elif self.instance and self.instance.subject:
             self.fields['selected_teacher'].queryset = Teacher.objects.filter(
-                subject=self.instance.subject
+                subject=self.instance.subject,
+                role=User.Role.TEACHER
             )
-
-    def clean(self):
-        cleaned_data = super().clean()
-        subject = cleaned_data.get('subject')
-        selected_teacher = cleaned_data.get('selected_teacher')
-
-        if subject and selected_teacher:
-            if selected_teacher.subject != subject:
-                raise forms.ValidationError(
-                    "Selected teacher does not teach the selected subject."
-                )
-        return cleaned_data
