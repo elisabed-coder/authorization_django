@@ -15,7 +15,7 @@
             <h2>Hello, {{ user.username }}!</h2>
 
             {% if user.role == "STUDENT" %}
-                <p>Welcome to the student dashboard. Here you can find your subject, view your progress, and access other resources.</p>
+                <p>Welcome to the student dashboard. Here you can find your subjects, view your progress, and access other resources.</p>
                 <a href="{% url 'user:select_teacher_subject' %}">Teacher List</a>
 
             {% elif user.role == "TEACHER" %}
@@ -28,8 +28,7 @@
 
             <h3>Your Subject:</h3>
             <p>{{ user.subject }}</p>
-            <p>selected teacher: {{ user.selected_teacher }}</p>
-
+            <p>Selected teacher: {{ user.selected_teacher }}</p>
 
         {% else %}
             <p>Please <a href="{% url 'user:login_view' %}">log in</a> to access your dashboard.</p>

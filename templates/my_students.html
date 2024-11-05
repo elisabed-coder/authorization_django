@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>My Students</h2>
+
+{% if students %}
+    <ul>
+        {% for student in students %}
+            <li>
+                {{ student.username }} - 
+                <a href="{% url 'user:mark_list' student.id %}">Write Marks</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No students assigned to you.</p>
+{% endif %}
+
+{% endblock %}

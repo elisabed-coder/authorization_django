@@ -13,5 +13,8 @@ urlpatterns = [
     path('get-teachers/', views.get_teachers_by_subject, name='get_teachers_by_subject'),  # Add this line
     path('logout/', views.logout_view, name='logout'),
     path('delete_subject_selection/', views.delete_subject_selection, name='delete_subject_selection'),
+    path('marks/<int:student_id>/', views.MarkListView.as_view(), name='mark_list'),
+    path('marks/<int:student_id>/add/', views.MarkCreateView.as_view(), name='mark_add'),
+    path('my_students/', views.MyStudentsView.as_view(), name='my_students'),
 
 ]

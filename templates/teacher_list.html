@@ -4,10 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Select Subject and Teacher</title>
-    <style>
-        .form-error { color: red; }
-        .debug-info { background: #f0f0f0; padding: 10px; margin: 10px 0; }
-    </style>
 </head>
 <body>
     <h1>Select Your Subject and Teacher</h1>
@@ -47,17 +43,14 @@
 
         <button type="submit">Save Selection</button>
     </form>
+    <a href="{% url 'user:home' %}" class="button">Go back</a>
 
-    {% if debug %}
-    <div class="debug-info">
-        <h3>Debug Information</h3>
+    <div class="info">
+        <h3>Information</h3>
         <p>Current User: {{ user.username }}</p>
         <p>Current Subject: {{ user.subject }}</p>
-        <p>Form Data: {{ form.data }}</p>
         <p>Selected Teacher: {{ user.selected_teacher }}</p>
-        <p>Form Errors: {{ form.errors }}</p>
     </div>
-    {% endif %}
 
     <h2>Your Selected Subject</h2>
 
@@ -88,7 +81,7 @@
     $subjectSelect.val('');
     let initialSubject = $subjectSelect.val();
     if (initialSubject) {
-        $subjectSelect.change();  
+        $subjectSelect.change();
     }
 
     $teacherSelectionForm.on('submit', function() {

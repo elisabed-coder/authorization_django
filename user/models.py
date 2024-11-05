@@ -10,7 +10,7 @@ class User(AbstractUser):
         TEACHER = 'TEACHER', 'Teacher'
 
     class SubjectChoices(models.TextChoices):
-        ('', 'Choose Subject'),  # Default choice
+        ('', 'Choose Subject'),
         MATH = 'MATH', 'Math'
         ENGLISH = 'ENGLISH', 'English'
         ENGINEERING = 'ENGINEERING', 'Engineering'
@@ -60,3 +60,20 @@ class Teacher(User):
     def welcome(self):
         return "Only for Teachers"
 
+
+class Mark(models.Model):
+    student = models.ForeignKey(
+        Student,
+        on_delete=models.CASCADE,
+        related_name='student_marks'
+    )
+    subject = models.CharField(max_length=100)
+    teacher = models.ForeignKey(
+        Teacher,
+        on_delete=models.CASCADE,
+        related_name='teacher_marks'
+    )
+    mark = models.FloatField()
+
+    class Meta:
+        unique_together = ('student', 'subject')

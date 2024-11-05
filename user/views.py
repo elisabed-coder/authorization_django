@@ -4,10 +4,12 @@ from django.contrib.auth.forms import AuthenticationForm, logger
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
+from django.views.generic import View
 
-from .models import User, Teacher
+from .models import User, Teacher, Mark, Student
 from .forms import UserRegisterForm, StudentSelectionForm
 from django.http import JsonResponse
+from django.utils.decorators import method_decorator
 
 
 
@@ -47,14 +49,13 @@ def register(request):
         form = UserRegisterForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.role = form.cleaned_data['role']  # Set the role based on form input
+            user.role = form.cleaned_data['role']
             user.save()
             auth_login(request, user)
 
             # Redirect to a different form based on the role
             if user.role == User.Role.STUDENT:
-                return redirect('user:home')  # Redirect to subject selection for students
-
+                return redirect('user:home')
             messages.success(request, 'Registration successful.')
             return redirect('user:home')
         else:
@@ -71,8 +72,15 @@ def logout_view(request):
 @login_required
 def home(request):
     user = request.user  # Get the logged-in user
-    print(user.subject)  # Print to the console for debugging
-    return render(request, 'home.html', {'user': user})  # Pass user to the context
+
+    # Retrieve scores for the logged-in student, including subject names
+    scores = Mark.objects.filter(student=user).select_related('subject')
+
+    return render(request, 'home.html', {
+        'user': user,
+        'scores': scores
+    })
+
 def student_list(request):
     students = User.objects.filter(role=User.Role.STUDENT)
     return render(request, 'student_list.html', {'students': students})
@@ -103,9 +111,8 @@ def select_teacher_subject(request):
                 # Update user
                 user = form.save(commit=False)
                 user.subject = subject
-                user.selected_teacher = selected_teacher  # Assign the Teacher instance directly
-
-                user.role = User.Role.STUDENT  # This might be changed based on your logic
+                user.selected_teacher = selected_teacher
+                user.role = User.Role.STUDENT
                 user.save()
 
                 logger.info(f"User saved successfully. Subject: {user.subject}, Teacher: {user.selected_teacher.username}")
@@ -154,3 +161,48 @@ def delete_subject_selection(request):
         return JsonResponse({'message': 'Subject and teacher selection deleted successfully.'}, status=200)
     else:
         return JsonResponse({'error': 'Invalid request.'}, status=400)
+
+
+class MarkListView(View):
+    @staticmethod
+    def get(request, student_id):
+        teacher = request.user
+        student = get_object_or_404(Student, id=student_id)
+
+        # Filter marks for the selected student
+        marks = Mark.objects.filter(student=student)
+
+        context = {
+            'student': student,
+            'marks': marks,
+            'teacher': teacher,
+        }
+        return render(request, 'mark_list.html', context)
+
+class MarkCreateView(View):
+    @staticmethod
+    def post(request, student_id):
+        student = get_object_or_404(Student, id=student_id)
+        subject = request.POST.get('subject')  # This is now hidden
+        mark_value = request.POST.get('mark')
+
+        # Create or update the mark
+        Mark.objects.update_or_create(
+            student=student,
+            subject=subject,
+            defaults={'mark': mark_value, 'teacher': request.user}
+        )
+
+        return redirect('user:mark_list', student_id=student.id)
+
+
+@method_decorator(login_required, name='dispatch')
+class MyStudentsView(View):
+    def get(self, request):
+        teacher = request.user
+        students = Student.objects.filter(selected_teacher=teacher)
+
+        context = {
+            'students': students,
+        }
+        return render(request, 'my_students.html', context)

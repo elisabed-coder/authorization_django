@@ -1,9 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Students</h2>
+
+    <h2>Students</h2>
+    <a href="{% url 'user:my_students' %}" class="btn btn-primary">My Students</a>
+
 {% for student in students %}
     <p>{{ student.username }}</p>
-{#    <a href="{% url 'user:student_profile' student.id %}">View Profile</a>#}
 {% endfor %}
 {% endblock %}
+

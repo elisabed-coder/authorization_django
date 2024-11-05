@@ -1,0 +1,40 @@
+<h2>Marks for {{ student.username }}</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Subject</th>
+            <th>Mark</th>
+        </tr>
+    </thead>
+    <tbody>
+    <tbody>
+        {% for mark in marks %}
+        <tr>
+            <td>{{ mark.subject }}</td>
+            <td>{{ mark.mark }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h3>Total Marks</h3>
+<p>
+    Total: 
+    {% with total_marks=0 %}
+        {% for mark in marks %}
+            {% with total_marks=total_marks|add:mark.mark %}
+                {% if loop.last %} {{ total_marks }} {% endif %}
+            {% endwith %}
+        {% endfor %}
+    {% endwith %}
+</p>
+
+<h3>Add Mark</h3>
+<form action="{% url 'user:mark_add' student.id %}" method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="subject" value="{{ student.subject }}"> <!-- Ensure subject is hidden -->
+    <label for="mark">Mark:</label>
+    <input type="number" id="mark" name="mark" required>
+    <button type="submit">Submit Mark</button>
+</form>
