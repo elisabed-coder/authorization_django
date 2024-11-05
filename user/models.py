@@ -10,6 +10,7 @@ class User(AbstractUser):
         TEACHER = 'TEACHER', 'Teacher'
 
     class SubjectChoices(models.TextChoices):
+        ('', 'Choose Subject'),  # Default choice
         MATH = 'MATH', 'Math'
         ENGLISH = 'ENGLISH', 'English'
         ENGINEERING = 'ENGINEERING', 'Engineering'

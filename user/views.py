@@ -1,4 +1,4 @@
-from django.shortcuts import  redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth import login as auth_login, authenticate, logout
 from django.contrib.auth.forms import AuthenticationForm, logger
 from django.contrib import messages
@@ -96,19 +96,19 @@ def select_teacher_subject(request):
                 logger.info(f"Form is valid. Cleaned data: {form.cleaned_data}")
 
                 # Get the selected teacher instance
-                selected_teacher = form.cleaned_data['selected_teacher']
+                selected_teacher = form.cleaned_data['selected_teacher']  # This should be the Teacher instance
+
                 subject = form.cleaned_data['subject']
 
                 # Update user
                 user = form.save(commit=False)
                 user.subject = subject
-                user.selected_teacher = selected_teacher
+                user.selected_teacher = selected_teacher  # Assign the Teacher instance directly
 
-                # You may want to change the role dynamically based on some logic
                 user.role = User.Role.STUDENT  # This might be changed based on your logic
                 user.save()
 
-                logger.info(f"User saved successfully. Subject: {user.subject}, Teacher: {user.selected_teacher}")
+                logger.info(f"User saved successfully. Subject: {user.subject}, Teacher: {user.selected_teacher.username}")
                 messages.success(request, 'Your selection has been saved successfully.')
                 return redirect('user:home')
             else:
@@ -118,7 +118,6 @@ def select_teacher_subject(request):
             logger.exception("Error saving form")
             messages.error(request, f'An error occurred: {str(e)}')
     else:
-        # Handle GET request and populate the form with user's current selections
         form = StudentSelectionForm(instance=request.user)
         logger.info(f"Initialized GET form for user: {request.user.username}")
 
@@ -128,7 +127,6 @@ def select_teacher_subject(request):
         'debug': True
     }
     return render(request, 'teacher_list.html', context)
-
 
 @require_http_methods(["GET"])
 def get_teachers_by_subject(request):

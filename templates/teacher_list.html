@@ -37,7 +37,7 @@
             {% endif %}
         </div>
 
-        <div class="form-group">
+        <div class="form-group" id="teacherGroup" style="display:none;">  <!-- Initially hidden -->
             <label for="id_selected_teacher">{{ form.selected_teacher.label }}</label>
             {{ form.selected_teacher }}
             {% if form.selected_teacher.errors %}
@@ -54,14 +54,14 @@
         <p>Current User: {{ user.username }}</p>
         <p>Current Subject: {{ user.subject }}</p>
         <p>Form Data: {{ form.data }}</p>
-        <p>selected teacher: {{ user.selected_teacher }}</p>
+        <p>Selected Teacher: {{ user.selected_teacher }}</p>
         <p>Form Errors: {{ form.errors }}</p>
     </div>
     {% endif %}
 
     <h2>Your Selected Subject</h2>
 
-{% if user.subject %}
+    {% if user.subject %}
     <ul id="subjectList">
         <li>
             <strong>Selected Subject:</strong> {{ user.subject }}
@@ -70,41 +70,53 @@
             </button>
         </li>
     </ul>
-{% else %}
+    {% else %}
     <p>No subject selected yet.</p>
-{% endif %}
+    {% endif %}
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
-    $(document).ready(function() {
-        console.log('Document ready');  // Debug log
+   $(document).ready(function() {
+    console.log('Document ready');  // Debug log
 
-        // Add form submission handler
-        $('#teacherSelectionForm').on('submit', function() {
-            console.log('Form submitted');  // Debug log
-        });
+    // Cache jQuery selectors
+    const $subjectSelect = $('#id_subject');
+    const $teacherGroup = $('#teacherGroup');
+    const $teacherSelect = $('#id_selected_teacher');
+    const $teacherSelectionForm = $('#teacherSelectionForm');
 
-        // Handle subject change
-        $('#id_subject').change(function() {
-            let selectedSubject = $(this).val();
-            console.log('Selected subject:', selectedSubject);  // Debug log
+    $subjectSelect.val('');
+    let initialSubject = $subjectSelect.val();
+    if (initialSubject) {
+        $subjectSelect.change();  
+    }
+
+    $teacherSelectionForm.on('submit', function() {
+        console.log('Form submitted');
+    });
+
+    $subjectSelect.change(function() {
+        let selectedSubject = $(this).val();
+        console.log('Selected subject:', selectedSubject);
+
+        if (selectedSubject) {
+            $teacherGroup.show();
 
             $.ajax({
                 url: "{% url 'user:get_teachers_by_subject' %}",
                 data: { 'subject': selectedSubject },
                 success: function(data) {
-                    console.log('Received teacher data:', data);  // Debug log
-                    let teacherSelect = $('#id_selected_teacher');
-                    teacherSelect.empty();
+                    console.log('Received teacher data:', data);
+                    $teacherSelect.empty();
 
                     // Add a default option
-                    teacherSelect.append($('<option>', {
+                    $teacherSelect.append($('<option>', {
                         value: '',
                         text: 'Select a teacher'
                     }));
 
                     $.each(data, function(index, teacher) {
-                        teacherSelect.append($('<option>', {
+                        $teacherSelect.append($('<option>', {
                             value: teacher.id,
                             text: teacher.username
                         }));
@@ -116,9 +128,12 @@
                     console.error('Response:', xhr.responseText);
                 }
             });
-        });
+        } else {
+            // Hide the teacher selection group if no subject is selected
+            $teacherGroup.hide();
+        }
     });
-$(document).ready(function() {
+
     // Handle subject deletion along with teacher deletion
     $(document).on('click', '.delete-subject-button', function() {
         let subject = $(this).data('subject');
@@ -133,7 +148,7 @@ $(document).ready(function() {
             success: function() {
                 console.log('Subject and teacher deleted successfully');
                 $('#subjectList').remove();  // Remove the subject list item from the DOM
-                $('#teacherList').remove();  // Remove the teacher list item from the DOM, if applicable
+                $teacherGroup.hide();  // Hide the teacher selection group
                 location.reload();  // Reload the page to update the subject and teacher display
             },
             error: function(xhr, status, error) {
